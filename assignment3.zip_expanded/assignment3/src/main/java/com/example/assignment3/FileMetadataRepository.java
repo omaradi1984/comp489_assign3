@@ -6,5 +6,5 @@ import java.util.Optional;
 
 public interface FileMetadataRepository extends JpaRepository<FileMetaData, Long> {
     Optional<FileMetaData> findByFilename(String filename);
-    void deleteByFilename(String filename);
+    void deleteByFilename(String filename, String username);
 }

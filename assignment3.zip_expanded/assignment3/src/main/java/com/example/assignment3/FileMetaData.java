@@ -8,8 +8,8 @@ public class FileMetaData {
     @jakarta.persistence.GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String filename;
+    private int size;
     private String ownerName;
-    private String ownerEmail;
     private String ownerUsername; // Username for WebSocket notifications
 
 
@@ -18,14 +18,22 @@ public class FileMetaData {
     }
 
     // Constructor with parameters
-    public FileMetaData(String filename, String ownerName, String ownerEmail, String ownerUsername) {
+    public FileMetaData(String filename, String ownerName, int size, String ownerUsername) {
         this.filename = filename;
         this.ownerName = ownerName;
-        this.ownerEmail = ownerEmail;
+        this.size = size;
         this.ownerUsername = ownerUsername;
     }
 
-    // Getters and setters
+    public int getSize() {
+		return size;
+	}
+
+	public void setSize(int size) {
+		this.size = size;
+	}
+
+	// Getters and setters
     public Long getId() {
         return id;
     }
@@ -50,14 +58,7 @@ public class FileMetaData {
         this.ownerName = ownerName;
     }
 
-    public String getOwnerEmail() {
-        return ownerEmail;
-    }
-
-    public void setOwnerEmail(String ownerEmail) {
-        this.ownerEmail = ownerEmail;
-    }
-
+    
     public String getOwnerUsername() {
         return ownerUsername;
     }

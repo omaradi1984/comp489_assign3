@@ -7,56 +7,52 @@ import java.util.Optional;
 
 @Service
 public class FileSharingService {
-	
+
 	private static UserRepository userRepository;
-	
 	@Autowired
-    public FileSharingService(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
-	
-    @Autowired
-    private static FileMetadataRepository repository;
-    
-    @Autowired
-    private static NotificationController notificationController;
+	private static FileMetadataRepository repository;
 
-    public FileMetaData registerFile(FileMetaData fileMetadata) {
-        return repository.save(fileMetadata);
-    }
+	@Autowired
+	private static NotificationController notificationController;
 
-    public Optional<FileMetaData> searchFile(String filename) {
-        return repository.findByFilename(filename);
-    }
+	@Autowired
+	public FileSharingService(UserRepository userRepository) {
+		this.userRepository = userRepository;
+	}
 
-    public void removeFile(String filename) {
-        repository.deleteByFilename(filename);
-    }
+	public FileMetaData registerFile(FileMetaData fileMetadata) {
+		return repository.save(fileMetadata);
+	}
 
-    public Optional<FileMetaData> getFileOwnerInfo(String filename) {
-        return searchFile(filename);
-    }
+	public Optional<FileMetaData> searchFile(String filename) {
+		return repository.findByFilename(filename);
+	}
 
-    public static void downloadFile(String filename, String requesterUsername) {
-        // Find the file metadata by filename
-        repository.findByFilename(filename).ifPresent(metadata -> {
-            // Assuming we have a method to fetch requester's contact info (IP address, port, etc.)
-            String requesterContactInfo = getRequesterContactInfo(requesterUsername);
+	public void removeFile(String filename, String username) {
+		repository.deleteByFilename(filename, username);
+	}
 
-            // Construct a message for the owner with the requester's contact info
-            String message = String.format("User %s wants to download your file '%s'. Contact info: %s",
-                                            requesterUsername, filename, requesterContactInfo);
+	public Optional<FileMetaData> getFileOwnerInfo(String filename) {
+		return searchFile(filename);
+	}
 
-            // Notify the owner via WebSocket using their username
-            notificationController.notifyOwner(metadata.getOwnerUsername(), message);
+	public static void downloadFile(String filename, String requesterUsername) {
+		// Find the file metadata by filename
+		repository.findByFilename(filename).ifPresent(metadata -> {
 
-            // Here you could also log this event or perform other related tasks as needed
-        });
-    }
+			String requesterContactInfo = getRequesterContactInfo(requesterUsername);
 
-    private static String getRequesterContactInfo(String requesterUsername) {
-    	return userRepository.findById(requesterUsername)
-        .map(user -> user.getContactInfo())
-        .orElse("Unknown");
-    }
+			// Construct a message for the owner with the requester's contact info
+			String message = String.format("User %s wants to download your file '%s'. Contact info: %s",
+					requesterUsername, filename, requesterContactInfo);
+
+			// Notify the owner via WebSocket using their username
+			notificationController.notifyOwner(metadata.getOwnerUsername(), message);
+
+		});
+	}
+
+	private static String getRequesterContactInfo(String requesterUsername) {
+		return userRepository.findById(requesterUsername).map(user -> user.getContactInfo()).orElse("Unknown");
+	}
 }

@@ -23,8 +23,8 @@ public class FileSharingController {
     }
 
     @DeleteMapping("/remove/{filename}")
-    public void removeFile(@PathVariable String filename) {
-        service.removeFile(filename);
+    public void removeFile(@PathVariable String filename, @RequestParam String username) {
+        service.removeFile(filename, username);
     }
 
     @GetMapping("/owner/{filename}")
